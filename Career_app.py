@@ -8,10 +8,24 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sentence_transformers import SentenceTransformer, util
 import streamlit as st
+import sys
+import subprocess
+import torch
+import torch
 
 # === Data Loading & Cleaning ===
-df = pd.read_csv('career_path_in_all_field.csv')
+df = pd.read_csv('/content/career_path_in_all_field.csv')
+# Ensure torch is installed and compatible
+import importlib.util
 
+def install_torch_if_needed():
+    try:
+        # Optionally, check version here if you want a minimum version
+        pass
+    except ImportError:
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "torch"])
+
+install_torch_if_needed()
 sentence_model = SentenceTransformer('all-MiniLM-L6-v2')
 # Combine all relevant skill columns into a single string for each career
 desc_cols = [
