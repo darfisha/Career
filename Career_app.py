@@ -106,13 +106,6 @@ else:
 
 exclude_cols = ['Career', 'Field']
 feature_cols = [col for col in df.columns if col not in exclude_cols + ['Field_encoded']]
-X = df[feature_cols].values
-
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
-
-exclude_cols = ['Career', 'Field']
-feature_cols = [col for col in df.columns if col not in exclude_cols + ['Field_encoded']]
 # Only use numeric columns for scaling
 numeric_feature_cols = [col for col in feature_cols if pd.api.types.is_numeric_dtype(df[col])]
 X = df[numeric_feature_cols].values
