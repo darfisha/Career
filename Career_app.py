@@ -26,7 +26,7 @@ def embed_descriptions(descriptions):
 def embed_user_input(user_text, vectorizer):
     return vectorizer.transform([user_text])
 
-sentence_model = SentenceTransformer('all-MiniLM-L6-v2', device='cpu')
+sentence_model = SentenceTransformer('all-MiniLM-L6-v2')
 # Combine all relevant skill columns into a single string for each career
 desc_cols = [
     'GPA', 'Extracurricular_Activities', 'Internships', 'Projects', 'Leadership_Positions',
