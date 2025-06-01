@@ -12,21 +12,28 @@ import sys
 import subprocess
 import torch
 import torch
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 # === Data Loading & Cleaning ===
-df = pd.read_csv('/content/career_path_in_all_field.csv')
+df = pd.read_csv('career_path_in_all_field.csv')
 # Ensure torch is installed and compatible
 import importlib.util
 
-def install_torch_if_needed():
-    try:
-        # Optionally, check version here if you want a minimum version
-        pass
-    except ImportError:
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "torch"])
+# Remove torch and SentenceTransformer dependencies.
+# Use sklearn's TfidfVectorizer for text embedding and cosine_similarity for similarity.
 
-install_torch_if_needed()
-sentence_model = SentenceTransformer('all-MiniLM-L6-v2')
+
+# No torch or SentenceTransformer needed!
+def embed_descriptions(descriptions):
+    vectorizer = TfidfVectorizer()
+    embeddings = vectorizer.fit_transform(descriptions)
+    return embeddings, vectorizer
+
+def embed_user_input(user_text, vectorizer):
+    return vectorizer.transform([user_text])
+
+sentence_model = SentenceTransformer('all-MiniLM-L6-v2', device='cpu')
 # Combine all relevant skill columns into a single string for each career
 desc_cols = [
     'GPA', 'Extracurricular_Activities', 'Internships', 'Projects', 'Leadership_Positions',
