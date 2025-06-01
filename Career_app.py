@@ -373,3 +373,6 @@ if missing_skills:
                 st.write(f"- {res}")
         except Exception:
             pass
+
+        else:
+            print("\n✅ You already have most of the key skills for this cluster!")
