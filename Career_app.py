@@ -145,7 +145,9 @@ df['Cluster'] = cluster_labels
 
 all_cluster_careers = []
 for i in range(best_k):
-    cluster_career_counts = df[df['Cluster'] == i]['Career'].value_counts()
+    careers_in_cluster = df[df['Cluster'] == i]['Career'].tolist()
+    all_cluster_careers.append(careers_in_cluster)
+    cluster_career_counts = pd.Series(careers_in_cluster).value_counts()
     print(f"\nCluster {i} careers:\n{cluster_career_counts.head(10)}")
 # Use TfidfVectorizer for cluster embeddings
 cluster_vectorizer = TfidfVectorizer()
