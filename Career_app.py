@@ -5,7 +5,7 @@ import pandas as pd
 @st.cache_data
 def load_data():
     # Replace with your actual dataset path
-    df = pd.read_csv('careers_dataset.csv')
+    df = pd.read_csv('career_path_in_all_field.csv')
     return df
 
 df = load_data()
