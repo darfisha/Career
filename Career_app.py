@@ -50,17 +50,17 @@ vectorizer = TfidfVectorizer()
 career_embeddings = vectorizer.fit_transform(df['description'].tolist())
 
 def recommend_career(user_skills_text):
+    # Lowercase and strip input for better matching
+    user_skills_text = user_skills_text.lower().strip()
     # Embed user input
     user_embedding = vectorizer.transform([user_skills_text])
-    
     # Compute cosine similarity with career descriptions
     similarities = cosine_similarity(user_embedding, career_embeddings)[0]
-    
-    # Get top 3 career matches
-    top_indices = similarities.argsort()[-3:][::-1]
+    # Get top 10 career matches for debugging
+    top_indices = similarities.argsort()[-10:][::-1]
     recommendations = df.iloc[top_indices]
-    
-    return recommendations, similarities[top_indices]
+    top_scores = similarities[top_indices]
+    return recommendations, top_scores
 
 # Streamlit app starts here
 st.title("Career Path Recommendation System")
