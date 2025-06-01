@@ -11,7 +11,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 # === Data Loading & Cleaning ===
-df = pd.read_csv('/content/career_path_in_all_field.csv')
+df = pd.read_csv('career_path_in_all_field.csv')
 
 # Remove torch and SentenceTransformer dependencies.
 # Use sklearn's TfidfVectorizer for text embedding and cosine_similarity for similarity.
