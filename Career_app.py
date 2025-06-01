@@ -6,9 +6,9 @@ from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sentence_transformers import SentenceTransformer, util
 import streamlit as st
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 # === Data Loading & Cleaning ===
 df = pd.read_csv('career_path_in_all_field.csv')
@@ -26,7 +26,6 @@ def embed_descriptions(descriptions):
 def embed_user_input(user_text, vectorizer):
     return vectorizer.transform([user_text])
 
-sentence_model = SentenceTransformer('all-MiniLM-L6-v2')
 # Combine all relevant skill columns into a single string for each career
 desc_cols = [
     'GPA', 'Extracurricular_Activities', 'Internships', 'Projects', 'Leadership_Positions',
@@ -45,14 +44,17 @@ def row_to_description(row):
     return "; ".join(desc)
 
 df['description'] = df.apply(row_to_description, axis=1)
-career_embeddings = sentence_model.encode(df['description'].tolist())
+
+# Use TfidfVectorizer for text embedding
+vectorizer = TfidfVectorizer()
+career_embeddings = vectorizer.fit_transform(df['description'].tolist())
 
 def recommend_career(user_skills_text):
     # Embed user input
-    user_embedding = sentence_model.encode([user_skills_text])
+    user_embedding = vectorizer.transform([user_skills_text])
     
     # Compute cosine similarity with career descriptions
-    similarities = util.cos_sim(user_embedding, career_embeddings)[0].cpu().numpy()
+    similarities = cosine_similarity(user_embedding, career_embeddings)[0]
     
     # Get top 3 career matches
     top_indices = similarities.argsort()[-3:][::-1]
@@ -152,13 +154,10 @@ all_cluster_careers = []
 for i in range(best_k):
     cluster_career_counts = df[df['Cluster'] == i]['Career'].value_counts()
     print(f"\nCluster {i} careers:\n{cluster_career_counts.head(10)}")
-    all_cluster_careers.append(list(cluster_career_counts.index))
-
-model = SentenceTransformer('all-MiniLM-L6-v2')
-
-cluster_embeddings = []
-for careers in all_cluster_careers:
-    career_text = " ".join(careers)
+# Use TfidfVectorizer for cluster embeddings
+cluster_vectorizer = TfidfVectorizer()
+all_career_texts = [" ".join(careers) for careers in all_cluster_careers]
+cluster_embeddings = cluster_vectorizer.fit_transform(all_career_texts)
     emb = model.encode(career_text, convert_to_tensor=True)
     cluster_embeddings.append(emb)
 
@@ -378,13 +377,13 @@ learning_resources = {
 
 # === User input for skills ===
 user_text = input("\nEnter your skills and experience (comma-separated): ")
+user_text = input("\nEnter your skills and experience (comma-separated): ")
 user_skills = [s.strip().lower() for s in user_text.split(',') if s.strip()]
 
-user_embedding = model.encode(user_text, convert_to_tensor=True)
+user_embedding = cluster_vectorizer.transform([user_text])
 
-similarities = [util.cos_sim(user_embedding, cluster_emb)[0][0].item() for cluster_emb in cluster_embeddings]
+similarities = cosine_similarity(user_embedding, cluster_embeddings)[0]
 best_cluster = np.argmax(similarities)
-
 print(f"\n🎯 Most compatible cluster: Cluster {best_cluster} with similarity score: {similarities[best_cluster]:.4f}")
 print("\nRecommended careers for you from this cluster:")
 for career in all_cluster_careers[best_cluster]:
