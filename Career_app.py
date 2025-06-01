@@ -11,7 +11,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 # === Data Loading & Cleaning ===
-df = pd.read_csv('career_path_in_all_field.csv')
+df = pd.read_csv('/content/career_path_in_all_field.csv')
 
 # Remove torch and SentenceTransformer dependencies.
 # Use sklearn's TfidfVectorizer for text embedding and cosine_similarity for similarity.
@@ -158,8 +158,8 @@ for i in range(best_k):
 cluster_vectorizer = TfidfVectorizer()
 all_career_texts = [" ".join(careers) for careers in all_cluster_careers]
 cluster_embeddings = cluster_vectorizer.fit_transform(all_career_texts)
-    emb = model.encode(career_text, convert_to_tensor=True)
-    cluster_embeddings.append(emb)
+# emb = model.encode(career_text, convert_to_tensor=True)
+# cluster_embeddings.append(emb)
 
 # === Define career to skill mapping here manually ===
 career_skill_map = {
