@@ -147,9 +147,10 @@ if st.button("Recommend Careers"):
         recs, scores = recommend_career(user_input)
         
         st.write("### Recommended Careers for You:")
-        for idx, row in recs.iterrows():
-            st.write(f"**{row['Career']}** (Similarity: {scores[list(recs.index).index(idx)]:.2f})")
-            st.write(f"- {row['description']}")
+      for idx, row in recs.iterrows():
+    st.write(f"**{row['Career']}** (Similarity: {scores[list(recs.index).index(idx)]:.2f})")
+    st.write(f"- {row['description']}")
+         
 
 print("Initial info:")
 print(df.info())
