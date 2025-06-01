@@ -63,32 +63,31 @@ def recommend_career(user_skills_text):
     return recommendations, similarities[top_indices]
 
 # Streamlit app starts here
-# Helper function to render a progression bar using circles
-def render_progress_bar(value, max_value=5):
-    try:
-        value = int(float(value))
-    except:
-        value = 0
-    value = max(0, min(value, max_value))
-    filled = '●' * value
-    empty = '○' * (max_value - value)
-    return f"{filled}{empty}"
+# ... (rest of your code above remains unchanged)
 
-# In the Streamlit display loop, replace the description display:
-if st.button("Recommend Careers"):
+# === Streamlit App ===
+st.title("🚀 Career Recommendation Engine 🎯")
+
+user_input = st.text_input("💡 Enter your skills and experience (comma-separated):", "")
+
+if st.button("🔍 Recommend Careers"):
     if user_input.strip():
         recs, scores = recommend_career(user_input)
-        st.write("### Recommended Careers for You:")
+        st.write("### 🌟 Recommended Careers for You:")
         for idx, row in recs.iterrows():
-            st.write(f"**{row['Career']}** (Similarity: {scores[list(recs.index).index(idx)]:.2f})")
-            # Show progression bars for numerical columns
+            st.write(f"**{row['Career']}** (🧠 Similarity: {scores[list(recs.index).index(idx)]:.2f})")
             for col in desc_cols:
                 if col in num_cols:
-                    st.write(f"- {col.replace('_', ' ')}: {render_progress_bar(row[col])}")
+                    st.write(f"- {col.replace('_', ' ')}: {render_progress_bar(row.get(col, 0))}")
                 else:
-                    val = str(row[col]).replace('-', ' ').strip()
+                    val = str(row.get(col, '')).replace('-', ' ').strip()
                     if val and val.lower() != 'nan' and val != '0':
                         st.write(f"- {col.replace('_', ' ')}: {val}")
+
+st.markdown("---")
+st.markdown("<h4 style='text-align: center;'>✨ Made by Darfisha Shaikh for Hack The Haze ✨</h4>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center;'>💻🚀🌈</p>", unsafe_allow_html=True)
+
 
 print("Initial info:")
 print(df.info())
