@@ -53,28 +53,86 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-def recommend_career(user_skills_text, df):
-    # Combine all career skills into a list
-    career_skills_list = df['Skills'].astype(str).tolist()
-    # Add user input as the last document
-    documents = career_skills_list + [user_skills_text]
-    
-    # Vectorize using TF-IDF
-    vectorizer = TfidfVectorizer(stop_words='english')
-    tfidf_matrix = vectorizer.fit_transform(documents)
-    
-    # Compute cosine similarity between user input and all careers
-    user_vec = tfidf_matrix[-1]
-    career_vecs = tfidf_matrix[:-1]
-    similarities = cosine_similarity(user_vec, career_vecs).flatten()
-    
-    # Add similarity scores to DataFrame
-    df['similarity_score'] = similarities
-    
-    # Get top 10 recommendations
-    recommendations = df.sort_values('similarity_score', ascending=False).head(10)
-    top_scores = recommendations['similarity_score'].values
-    return recommendations, top_scores
+import pandas as pd
+
+# Expanded DataFrame with 20+ careers
+careers_df = pd.DataFrame({
+    'career': [
+        'Software Engineer', 'Data Scientist', 'Accountant', 'Mechanical Engineer', 'Civil Engineer',
+        'Doctor', 'Nurse', 'Teacher', 'Graphic Designer', 'Lawyer',
+        'Marketing Manager', 'Salesperson', 'Pharmacist', 'Psychologist', 'Architect',
+        'Chef', 'Journalist', 'Electrician', 'Plumber', 'Pilot',
+        'Dentist', 'Veterinarian', 'Web Developer'
+    ],
+    'skills': [
+        'programming, problem solving, algorithms',
+        'statistics, programming, data analysis, machine learning',
+        'math, finance, attention to detail',
+        'mechanical design, problem solving, physics',
+        'construction, design, project management',
+        'medicine, diagnosis, empathy',
+        'patient care, empathy, teamwork',
+        'communication, subject knowledge, patience',
+        'creativity, design, digital tools',
+        'argumentation, research, communication',
+        'marketing, communication, strategy',
+        'sales, negotiation, communication',
+        'pharmacy, chemistry, attention to detail',
+        'psychology, empathy, research',
+        'design, drawing, creativity',
+        'cooking, creativity, time management',
+        'writing, research, communication',
+        'wiring, troubleshooting, safety',
+        'plumbing, troubleshooting, repair',
+        'navigation, communication, decision making',
+        'dentistry, precision, patient care',
+        'animal care, diagnosis, empathy',
+        'web development, programming, design'
+    ],
+    'description': [
+        'Develops software and solves technical problems.',
+        'Analyzes data, builds models, and interprets results.',
+        'Manages financial records and prepares reports.',
+        'Designs and builds mechanical systems and devices.',
+        'Plans and oversees construction projects.',
+        'Diagnoses and treats illnesses in patients.',
+        'Provides care and support to patients in medical settings.',
+        'Educates students and prepares lesson plans.',
+        'Creates visual content for print and digital media.',
+        'Represents clients in legal matters and provides legal advice.',
+        'Develops marketing strategies and manages campaigns.',
+        'Sells products or services and builds client relationships.',
+        'Dispenses medications and advises on their use.',
+        'Studies human behavior and helps people with mental health issues.',
+        'Designs buildings and oversees construction projects.',
+        'Prepares meals and manages kitchen operations.',
+        'Researches and writes news articles and reports.',
+        'Installs and repairs electrical systems.',
+        'Installs and repairs plumbing systems.',
+        'Operates aircraft and ensures passenger safety.',
+        'Provides dental care and oral health advice.',
+        'Cares for animals and diagnoses their health problems.',
+        'Builds and maintains websites and web applications.'
+    ]
+})
+
+def recommend_career(user_input):
+    user_input_lower = user_input.lower()
+    scores = []
+    for idx, row in careers_df.iterrows():
+        skill_match = sum(word in row['skills'].lower() for word in user_input_lower.split())
+        desc_match = sum(word in row['description'].lower() for word in user_input_lower.split())
+        total_score = skill_match + desc_match
+        scores.append(total_score)
+    careers_df['score'] = scores
+    top = careers_df.sort_values('score', ascending=False).head(2)
+    recommendations = top['career'].tolist()
+    scores = top['score'].tolist()
+    return recommendations, scores
+
+user_input = "I like programming and solving problems."
+recs, scores = recommend_career(user_input)
+print(recs, scores)
 
 
 # Streamlit app starts here
