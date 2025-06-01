@@ -136,18 +136,11 @@ print(recs, scores)
 
 
 # Streamlit app starts here
-# Streamlit app starts here
-st.title("Career Path Recommendation System")
-
-st.write("Enter your skills or interests, and get personalized career path recommendations!")
-
-user_input = st.text_area("Enter your skills (comma separated or descriptive text):")
-
 if st.button("Recommend Careers"):
     if user_input.strip():
         recs, scores = recommend_career(user_input)
 
-        if recs is not None and not recs.empty:
+        if recs is not None and hasattr(recs, "empty") and not recs.empty:
             st.write("### Recommended Careers for You:")
             for idx, row in recs.iterrows():
                 st.write(f"**{row['Career']}** (Similarity: {scores[list(recs.index).index(idx)]:.2f})")
