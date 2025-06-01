@@ -10,7 +10,7 @@ from sentence_transformers import SentenceTransformer, util
 import streamlit as st
 
 # === Data Loading & Cleaning ===
-df = pd.read_csv('/content/career_path_in_all_field.csv')
+df = pd.read_csv('career_path_in_all_field.csv')
 
 sentence_model = SentenceTransformer('all-MiniLM-L6-v2')
 career_embeddings = sentence_model.encode(df['description'].tolist())
