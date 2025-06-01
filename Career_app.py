@@ -13,18 +13,18 @@ import streamlit as st
 df = pd.read_csv('/content/career_path_in_all_field.csv')
 
 sentence_model = SentenceTransformer('all-MiniLM-L6-v2')
-career_embeddings = sentence_model.encode(career_data['description'].tolist())
+career_embeddings = sentence_model.encode(df['description'].tolist())
 
 def recommend_career(user_skills_text):
     # Embed user input
     user_embedding = sentence_model.encode([user_skills_text])
     
     # Compute cosine similarity with career descriptions
-    similarities = cosine_similarity(user_embedding, career_embeddings)[0]
+    similarities = util.cos_sim(user_embedding, career_embeddings)[0].cpu().numpy()
     
     # Get top 3 career matches
     top_indices = similarities.argsort()[-3:][::-1]
-    recommendations = career_data.iloc[top_indices]
+    recommendations = df.iloc[top_indices]
     
     return recommendations, similarities[top_indices]
 
@@ -97,6 +97,7 @@ plt.xlabel("Number of Clusters")
 plt.ylabel("Silhouette Score")
 plt.grid(True)
 plt.show()
+
 
 best_k = k_values[np.argmax(sil_scores)]
 print(f"\n✅ Best number of clusters (k): {best_k}")
@@ -365,9 +366,10 @@ if missing_skills:
         print(f"\n{skill.capitalize()}:")
         for res in resources:
             print(f"  * {res}")
-else:
-    print("\n🎉 You seem to have all the key skills for careers in this cluster!")
-
-        st.write("---")
-  else:
-        st.warning("Please enter your skills or interests to get recommendations.")
+        # Also show in Streamlit if running in Streamlit context
+        try:
+            st.write(f"**{skill.capitalize()}**:")
+            for res in resources:
+                st.write(f"- {res}")
+        except Exception:
+            pass
