@@ -63,20 +63,32 @@ def recommend_career(user_skills_text):
     return recommendations, similarities[top_indices]
 
 # Streamlit app starts here
-st.title("Career Path Recommendation System")
+# Helper function to render a progression bar using circles
+def render_progress_bar(value, max_value=5):
+    try:
+        value = int(float(value))
+    except:
+        value = 0
+    value = max(0, min(value, max_value))
+    filled = '●' * value
+    empty = '○' * (max_value - value)
+    return f"{filled}{empty}"
 
-st.write("Enter your skills or interests, and get personalized career path recommendations!")
-
-user_input = st.text_area("Enter your skills (comma separated or descriptive text):")
-
+# In the Streamlit display loop, replace the description display:
 if st.button("Recommend Careers"):
     if user_input.strip():
         recs, scores = recommend_career(user_input)
-        
         st.write("### Recommended Careers for You:")
         for idx, row in recs.iterrows():
             st.write(f"**{row['Career']}** (Similarity: {scores[list(recs.index).index(idx)]:.2f})")
-            st.write(f"- {row['description']}")
+            # Show progression bars for numerical columns
+            for col in desc_cols:
+                if col in num_cols:
+                    st.write(f"- {col.replace('_', ' ')}: {render_progress_bar(row[col])}")
+                else:
+                    val = str(row[col]).replace('-', ' ').strip()
+                    if val and val.lower() != 'nan' and val != '0':
+                        st.write(f"- {col.replace('_', ' ')}: {val}")
 
 print("Initial info:")
 print(df.info())
