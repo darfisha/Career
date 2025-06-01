@@ -49,18 +49,25 @@ df['description'] = df.apply(row_to_description, axis=1)
 vectorizer = TfidfVectorizer()
 career_embeddings = vectorizer.fit_transform(df['description'].tolist())
 
+import pandas as pd
+
 def recommend_career(user_skills_text):
-    # Lowercase and strip input for better matching
-    user_skills_text = user_skills_text.lower().strip()
-    # Embed user input
-    user_embedding = vectorizer.transform([user_skills_text])
-    # Compute cosine similarity with career descriptions
-    similarities = cosine_similarity(user_embedding, career_embeddings)[0]
-    # Get top 10 career matches for debugging
-    top_indices = similarities.argsort()[-10:][::-1]
-    recommendations = df.iloc[top_indices]
-    top_scores = similarities[top_indices]
+    # Lowercase and split user input into a set of skills
+    user_skills = set(skill.strip().lower() for skill in user_skills_text.split(','))
+    
+    # Function to compute overlap between user skills and career skills
+    def skill_overlap(row):
+        career_skills = set(skill.strip().lower() for skill in row['Skills'].split(','))
+        return len(user_skills & career_skills)
+    
+    # Compute overlap score for each career
+    df['overlap_score'] = df.apply(skill_overlap, axis=1)
+    
+    # Get top 10 careers with highest overlap
+    recommendations = df.sort_values('overlap_score', ascending=False).head(10)
+    top_scores = recommendations['overlap_score'].values
     return recommendations, top_scores
+
 
 # Streamlit app starts here
 st.title("Career Path Recommendation System")
