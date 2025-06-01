@@ -8,17 +8,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sentence_transformers import SentenceTransformer, util
 import streamlit as st
-import sys
-import subprocess
-import torch
-import torch
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 
 # === Data Loading & Cleaning ===
 df = pd.read_csv('career_path_in_all_field.csv')
-# Ensure torch is installed and compatible
-import importlib.util
 
 # Remove torch and SentenceTransformer dependencies.
 # Use sklearn's TfidfVectorizer for text embedding and cosine_similarity for similarity.
@@ -116,12 +109,22 @@ X = df[feature_cols].values
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
-pca = PCA(n_components=0.95, random_state=42)
-X_pca = pca.fit_transform(X_scaled)
-print(f"PCA reduced dimensions: {X_pca.shape[1]}")
+exclude_cols = ['Career', 'Field']
+feature_cols = [col for col in df.columns if col not in exclude_cols + ['Field_encoded']]
+# Only use numeric columns for scaling
+numeric_feature_cols = [col for col in feature_cols if pd.api.types.is_numeric_dtype(df[col])]
+X = df[numeric_feature_cols].values
 
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+# Define the range of k values to try for clustering
+k_values = range(2, 11)
 sil_scores = []
-k_values = range(5, 31, 5)
+
+# Compute X_pca using PCA with n_components=15
+pca = PCA(n_components=15)
+X_pca = pca.fit_transform(X_scaled)
+
 for k in k_values:
     kmeans = KMeans(n_clusters=k, random_state=42)
     labels = kmeans.fit_predict(X_pca)
