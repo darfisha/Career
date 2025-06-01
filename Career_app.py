@@ -10,9 +10,27 @@ from sentence_transformers import SentenceTransformer, util
 import streamlit as st
 
 # === Data Loading & Cleaning ===
-df = pd.read_csv('career_path_in_all_field.csv')
+df = pd.read_csv('/content/career_path_in_all_field.csv')
 
 sentence_model = SentenceTransformer('all-MiniLM-L6-v2')
+# Combine all relevant skill columns into a single string for each career
+desc_cols = [
+    'GPA', 'Extracurricular_Activities', 'Internships', 'Projects', 'Leadership_Positions',
+    'Field_Specific_Courses', 'Research_Experience', 'Coding_Skills', 'Communication_Skills',
+    'Problem_Solving_Skills', 'Teamwork_Skills', 'Analytical_Skills', 'Presentation_Skills',
+    'Networking_Skills', 'Industry_Certifications'
+]
+
+def row_to_description(row):
+    # Replace underscores with spaces in column names for readability
+    desc = []
+    for col in desc_cols:
+        val = str(row[col]).replace('-', ' ').strip()
+        if val and val.lower() != 'nan' and val != '0':
+            desc.append(f"{col.replace('_', ' ')}: {val}")
+    return "; ".join(desc)
+
+df['description'] = df.apply(row_to_description, axis=1)
 career_embeddings = sentence_model.encode(df['description'].tolist())
 
 def recommend_career(user_skills_text):
