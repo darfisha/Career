@@ -145,11 +145,12 @@ user_input = st.text_area("Enter your skills (comma separated or descriptive tex
 if st.button("Recommend Careers"):
     if user_input.strip():
         recs, scores = recommend_career(user_input)
-        
+
         st.write("### Recommended Careers for You:")
-      for idx, row in recs.iterrows():
-    st.write(f"**{row['Career']}** (Similarity: {scores[list(recs.index).index(idx)]:.2f})")
-    st.write(f"- {row['description']}")
+        for idx, row in recs.iterrows():
+            st.write(f"**{row['Career']}** (Similarity: {scores[list(recs.index).index(idx)]:.2f})")
+            st.write(f"- {row['description']}")
+
          
 
 print("Initial info:")
