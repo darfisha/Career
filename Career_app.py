@@ -32,11 +32,11 @@ def render_progress_bar(value, max_value=10):
     return bar
 
 def recommend_career(user_input, top_n=3):
-    # Dummy recommendation logic for demonstration
-    # Replace with your actual recommendation logic
-    # Example: filter by user_input if not empty
+    # Columns to search for user input
+    search_cols = ['Career', 'Skills', 'Field_Specific_Courses', 'Projects']
     if user_input.strip():
-        filtered = df[df.apply(lambda row: user_input.lower() in str(row).lower(), axis=1)]
+        mask = df[search_cols].apply(lambda row: any(user_input.lower() in str(val).lower() for val in row), axis=1)
+        filtered = df[mask]
         if not filtered.empty:
             return filtered.head(top_n)
     return df.head(top_n)
